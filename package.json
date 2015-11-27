@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-regexplace",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Replace (RegEx) page section texts with given substitutes",
   "scripts": {
     "test": "echo \"Error: no tests specified\" && exit 1"
@@ -28,11 +28,11 @@
   },
   "homepage": "https://github.com/markomanninen/gitbook-plugin-regexplace#readme",
   "gitHead": "2bbdc484c228720e925a93d5a300a64c416ad3e6",
-  "_id": "gitbook-plugin-regexplace@0.1.1",
+  "_id": "gitbook-plugin-regexplace@1.0.0",
   "_shasum": "a40a2bf007b7238718cc19a23cb7daff5d12bbd4",
-  "_from": "gitbook-plugin-regexplace@0.1.1",
-  "_npmVersion": "2.13.2",
-  "_nodeVersion": "0.12.7",
+  "_from": "gitbook-plugin-regexplace@1.0.0",
+  "_npmVersion": "1.4.28",
+  "_nodeVersion": "v0.10.33",
   "_npmUser": {
     "name": "markom",
     "email": "mmstud@gmail.com"
@@ -45,8 +45,8 @@
   ],
   "dist": {
     "shasum": "a40a2bf007b7238718cc19a23cb7daff5d12bbd4",
-    "tarball": "http://registry.npmjs.org/gitbook-plugin-regexplace/-/gitbook-plugin-regexplace-0.1.1.tgz"
+    "tarball": "http://registry.npmjs.org/gitbook-plugin-regexplace/-/gitbook-plugin-regexplace-1.0.0.tgz"
   },
   "directories": {},
-  "_resolved": "https://registry.npmjs.org/gitbook-plugin-regexplace/-/gitbook-plugin-regexplace-0.1.1.tgz"
+  "_resolved": "https://registry.npmjs.org/gitbook-plugin-regexplace/-/gitbook-plugin-regexplace-1.0.0.tgz"
 }
