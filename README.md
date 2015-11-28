@@ -1,13 +1,13 @@
 regexplace
 ==========
-Common text replacement plugin for GitBook project.
+General text replacement (RegExp -style) plugin for GitBook projects.
 
 Usage example
 -----
 
-Mark partition on page that should not break on printing a page or generating a page as a pdf.
+Mark partition on a page that should not break on printing a page or generating a page as a pdf.
 
-Add the ```regexplace``` plugin on the plugins array of your book.json file and configure appropriate substitutes and texts to replace:
+Add the ```regexplace``` plugin on the plugins array of your ```book.json``` file and configure appropriate substitutes and texts to replace:
 
 ```json
 {
@@ -48,4 +48,4 @@ div.nopb {
 }
 ```
 
-Unlimited other usages can be found for the plugin.
+Many other usages can be found for the plugin.
