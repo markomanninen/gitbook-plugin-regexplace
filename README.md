@@ -61,7 +61,7 @@ Of course this also requires setting some style definitions for website and pdf 
 
 ```json
 "styles": {
-    "website": "media/website.css"
+    "website": "media/website.css",
     "pdf": "media/website.css"
 }
 ```
