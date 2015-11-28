@@ -1,4 +1,4 @@
-regexplace
+gitbook-plugin-regexplace
 ==========
 General text replacement (RegExp -style) plugin for GitBook projects.
 
@@ -7,7 +7,7 @@ RegExp guide: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regu
 Usage example
 -----
 
-Mark partition on the page that should not break on printing the page or generating the page as a pdf.
+Mark partitions on the page that should not break apart on printing the page or generating the page as a pdf.
 
 Add the ```regexplace``` plugin on the plugins array of your ```book.json``` file and configure appropriate substitutes and texts to replace:
 
@@ -25,11 +25,16 @@ Add the ```regexplace``` plugin on the plugins array of your ```book.json``` fil
 }
 ```
 
-Mark page partitions to text files:
+Mark page partitions to text (markdown) files:
 
 ```markdown
 <!-- nopb -->
+# Title
+
 Normal content...
+
+> additional text blocks
+
 <!-- endnopb -->
 ```
 
@@ -37,11 +42,13 @@ This will produce:
 
 ```html
 <div class="nopb">
-Normal content...
+<h1>Title</h1>
+<p>Normal content...</p>
+<quote>additional text blocks</quote>
 </div>
 ```
 
-While above configuration is combined with the following website.css code block, it should prevent page breaks inside partition:
+When above configuration is combined with the following website.css code block, it should prevent page breaks inside partitions, which are defined with div elements having a class ```nopb```:
 
 ```css
 div.nopb {
@@ -50,7 +57,7 @@ div.nopb {
 }
 ```
 
-Of course this also requires setting same style for website and pdf generation on ```book.json```:
+Of course this also requires setting some style definitions for website and pdf generation on ```book.json``` similar to:
 
 ```json
 "styles": {
@@ -59,4 +66,7 @@ Of course this also requires setting same style for website and pdf generation o
 }
 ```
 
-Many other usages can be found for the plugin, because using html code blocks directly on markdown pages ruins rendering the page. You can set different style comment blocks and change them to html with substitutes defined on plugin configuration.
+Other examples
+-----
+
+Many other usages can be found for the plugin, because using html code blocks directly on markdown pages often ruins rendering the page. To solve the problem, you have to set comment blocks as described above markdown. Then you can change them to html with substitutes defined on plugin configuration.
