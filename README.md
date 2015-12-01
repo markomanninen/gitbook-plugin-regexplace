@@ -131,4 +131,6 @@ figcaption {
 }
 ```
 
+Screenshot from my [GitBook project](https://markomanninen.gitbooks.io/artifacts-of-the-flower-of-life/content/cownose.html) shown below:
+
 ![Image container](image-container.png)
