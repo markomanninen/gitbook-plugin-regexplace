@@ -74,6 +74,8 @@ Many other usages can be found for the plugin, because using html code blocks di
 Adding more complex container for image
 -----
 
+Next example is written with a help of RexExr v2.0 builder: http://regexr.com/3caon
+
 ```json
 {
 	"plugins": ["regexplace"],
@@ -83,7 +85,7 @@ Adding more complex container for image
 				{
                    "pattern": "<img (.*)alt=\"([^\"]*)\"(.*) {0,1}\/{0,1}> {0,}{caption([^\\}]*)}", 
                    "flags": "g", 
-                   "substitute": "<figure id=\"fig_PAGE_LEVEL_._INDEX_\"><img $1alt=\"$2\" $4$3><figcaption><span>Picture _PAGE_LEVEL_._INDEX_</span>: $2</figcaption></figure>"
+                   "substitute": "<figure id=\"fig_PAGE_LEVEL_._INDEX_\"><img $1alt=\"$2\" $4$3><figcaption><span>Picture _PAGE_LEVEL_._INDEX_: </span>$2</figcaption></figure>"
                 }
 			]
 		}
@@ -91,7 +93,7 @@ Adding more complex container for image
 }
 ```
 
-This example leverages ```_PAGE_LEVEL_``` and ```_INDEX_ ```templates which are replaced by page level information for ```_PAGE_LEVEL_``` and match index value for ```_INDEX_```.
+This example also leverages ```_PAGE_LEVEL_``` and ```_INDEX_ ```templates which are replaced by page level information for ```_PAGE_LEVEL_``` and match index value for ```_INDEX_``` in the ```gitbook-plugin-regexplace``` plugin.
 
 Lets assume ```page.md``` has a level 1 and there is content something like this:
 
@@ -101,12 +103,12 @@ Lets assume ```page.md``` has a level 1 and there is content something like this
 ![Image 2](image2.png){caption}
 ```
 
-This will produce output:
+By using above regex substitutes it will produce output:
 
 ```html
-<figure id="fig1.1"><img scr="image.png" alt="Image 1" width=300><figcaption><span>Picture 1.1</span>: Image 1</figcaption></figure>
+<figure id="fig1.1"><img scr="image.png" alt="Image 1" width=300><figcaption><span>Picture 1.1: </span>Image 1</figcaption></figure>
 
-<figure id="fig1.2"><img scr="image2.png" alt="Image 2"><figcaption><span>Picture 1.2</span>: Image 2</figcaption></figure>
+<figure id="fig1.2"><img scr="image2.png" alt="Image 2"><figcaption><span>Picture 1.2: </span>Image 2</figcaption></figure>
 ```
 
 Which in turn can be styled with ```website.css``` to get nice image caption and container:
@@ -129,4 +131,4 @@ figcaption {
 }
 ```
 
-See RexEx builder to try out more: http://regexr.com/3caon
+![Image container](image-container.png)
