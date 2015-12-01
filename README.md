@@ -70,3 +70,63 @@ Other examples
 -----
 
 Many other usages can be found for the plugin, because using html code blocks directly on markdown pages often ruins rendering the page. To solve the problem, you have to set comment blocks as described above markdown. Then you can change them to html with substitutes defined on plugin configuration.
+
+Adding more complex container for image
+-----
+
+```json
+{
+	"plugins": ["regexplace"],
+	"pluginsConfig": {
+		"regexplace": {
+			"substitutes": [
+				{
+                   "pattern": "<img (.*)alt=\"([^\"]*)\"(.*) {0,1}\/{0,1}> {0,}{caption([^\\}]*)}", 
+                   "flags": "g", 
+                   "substitute": "<figure id=\"fig_PAGE_LEVEL_._INDEX_\"><img $1alt=\"$2\" $4$3><figcaption><span>Picture _PAGE_LEVEL_._INDEX_</span>: $2</figcaption></figure>"
+                }
+			]
+		}
+	}
+}
+```
+
+This example leverages ```_PAGE_LEVEL_``` and ```_INDEX_ ```templates which are replaced by page level information for ```_PAGE_LEVEL_``` and match index value for ```_INDEX_```.
+
+Lets assume ```page.md``` has a level 1 and there is content something like this:
+
+```markdown
+![Image 1](image.png){caption width=300}
+
+![Image 2](image2.png){caption}
+```
+
+This will produce output:
+
+```html
+<figure id="fig1.1"><img scr="image.png" alt="Image 1" width=300><figcaption><span>Picture 1.1</span>: Image 1</figcaption></figure>
+
+<figure id="fig1.2"><img scr="image2.png" alt="Image 2"><figcaption><span>Picture 1.2</span>: Image 2</figcaption></figure>
+```
+
+Which in turn can be styled with ```website.css``` to get nice image caption and container:
+
+```css
+figure {
+    margin: 1.5em 0px;
+    padding: 10px 0;
+    text-align: center;
+}
+
+figcaption {
+    clear: left;
+    margin: 0.75em 0px;
+    text-align: center;
+    font-style: italic;
+    line-height: 1.5em;
+    font-size: 80%;
+    color: #666;
+}
+```
+
+See RexEx builder to try out more: http://regexr.com/3caon
