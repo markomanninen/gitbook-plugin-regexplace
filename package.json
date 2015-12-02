@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-regexplace",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Replace (RegExp -style) page section texts with given substitutes on GitBook projects",
   "scripts": {
     "test": "echo \"Error: no tests specified\" && exit 1"
@@ -43,6 +43,9 @@
       "email": "mmstud@gmail.com"
     }
   ],
+  "dependencies": {
+    "q": "^1.4.1"
+  },
   "dist": {
     "shasum": "a40a2bf007b7238718cc19a23cb7daff5d12bbd4",
     "tarball": "http://registry.npmjs.org/gitbook-plugin-regexplace/-/gitbook-plugin-regexplace-1.0.0.tgz"

@@ -1,5 +1,7 @@
 "use strict";
 
+var Q = require('q');
+
 var store = {};
 var patterns = [];
 var regex_page_level = new RegExp('_PAGE_LEVEL_', 'g');
@@ -17,88 +19,72 @@ var decodeHtmlEntities = function(str) {
   });
 };
 
-var pageWrapper = function(that, page, pageHook) {
-  var collectStore = function(section) {
-    // iterate regular expression patterns
-    var content = section.content;
-    patterns.forEach(function (pattern) {
-        var match, sub, sub2;
-        var i = 0;
-        var regex = pattern.re;
-        // get matches from content
-        while (match = regex.exec(content)) {
-            i += 1;
-            // use temporary storage if configured so
-            if (!pageHook && pattern.store && pattern.store.substitute) {
-              sub2 = pattern.store.substitute.replace(regex_index, i);
-              sub2 = sub2.replace(regex_page_level, page.progress.current.level);
-              sub2 = sub2.replace(regex_page_path, page.path);
+var collectStore = function(section, page, that, pageHook) {
+  var content = section.content;
+  // iterate regular expression patterns
+  patterns.forEach(function (pattern) {
+      var match, sub, sub2;
+      var i = 0;
+      var regex = pattern.re;
+      // get matches from content
+      while (match = regex.exec(content)) {
+          i += 1;
+          // use temporary storage if configured so
+          if (!pageHook && pattern.store && pattern.store.substitute) {
+            sub2 = pattern.store.substitute.replace(regex_index, i);
+            sub2 = sub2.replace(regex_page_level, page.progress.current.level);
+            sub2 = sub2.replace(regex_page_path, page.path);
+          }
+          // set _INDEX_, _PAGE_LEVEL_ and _PAGE_PATH_ templates
+          sub = pattern.sub.replace(regex_index, i);
+          sub = sub.replace(regex_page_level, page.progress.current.level);
+          sub = sub.replace(regex_page_path, page.path);
+          // find $n replacement parts from substitute string
+          for (var c = 1; c < match.length; c++) {
+            var $ = '\$'+c;
+            var count = sub.split($).length-1;
+            for (var d = 0; d < count; d++) {
+              sub = sub.replace($, match[c]);
             }
-            // set _INDEX_, _PAGE_LEVEL_ and _PAGE_PATH templates
-            sub = pattern.sub.replace(regex_index, i);
-            sub = sub.replace(regex_page_level, page.progress.current.level);
-            sub = sub.replace(regex_page_path, page.path);
-            // find $n replacement parts from substitute string
-            for (var c = 1; c < match.length; c++) {
-              var $ = '\$'+c;
-              var count = sub.split($).length-1;
-              for (var d = 0; d < count; d++) sub = sub.replace($, match[c]);
-              if (!pageHook && sub2) {
-                count = sub2.split($).length-1;
-                for (d = 0; d < count; d++) sub2 = sub2.replace($, match[c]);
+            if (!pageHook && sub2) {
+              count = sub2.split($).length-1;
+              for (d = 0; d < count; d++) {
+                sub2 = sub2.replace($, match[c]);
               }
             }
-            // if storage is used
-            if (!pageHook && sub2) {
-              store[pattern.store.variable_name] = store[pattern.store.variable_name] || {}
-              if (!store[pattern.store.variable_name][page.progress.current.level+"."+i])
-                store[pattern.store.variable_name][page.progress.current.level+"."+i] = sub2; 
-            }
-            // repeatingly replace content
-            content = match.input.replace(match[0], (pattern.decode ? decodeHtmlEntities(sub) : sub), match.index);
-        }
-    });
-    // finally replace section content with processed content
-    if (pageHook) section.content = content;
-  };
-  // process all normal sections in page
-  page.sections.filter(function(section) {
-    return section.type == 'normal';
-  })
-  .forEach(collectStore);
-  
-  return page;
-}
+          }
+          // if storage is used
+          if (!pageHook && sub2) {
+            that.config.book.options.variables[pattern.store.variable_name] = that.config.book.options.variables[pattern.store.variable_name] || [];
+            that.config.book.options.variables[pattern.store.variable_name].push(sub2);
+          }
+          // repeatingly replace content
+          content = match.input.replace(match[0], (pattern.decode ? decodeHtmlEntities(sub) : sub), match.index);
+      }
+  });
+  // finally replace section content with processed content
+  if (pageHook) section.content = content;
+};
 
 function processPages(that) {
-  var files = Object.keys(that.navigation);
-  var files_len = files.length-1;
-  // iterate each files found from navigation instance because navigation has pages in order
-  files.forEach(function (file, ind) {
-    that.parsePage(file).then(function(page) {
-      pageWrapper(that, page, false);
-    }).finally(function() {
-      // order store by keys
-      if (store && files_len == ind) {
-        orderStore(that);
-      }
+  var navs = [];
+  Object.keys(that.navigation).map(function(key) {
+    navs.push({key: key, order: parseInt(that.navigation[key].index)});
+  });
+  var promises = navs.sort(function(a, b) {
+    return a.order - b.order;
+  })
+  .map(function(item) {
+    return that.parsePage(item.key).then(function(page) {
+      return page.sections.filter(function(section) {
+        return section.type == 'normal';
+      })
+      .map(function(section) {
+        collectStore(section, page, that);
+      });
     });
   });
-}
-
-var orderStore = function(that) {
-  for (var key in store) {
-    if (store.hasOwnProperty(key)) {
-      that.config.book.options.variables[key] = that.config.book.options.variables[key] || [];
-      var keys = Object.keys(store[key]);
-      keys.sort();
-      for (var i=0; i<keys.length; i++) {
-        if (that.config.book.options.variables[key].indexOf(store[key][keys[i]]) < 0) {
-          that.config.book.options.variables[key].push(store[key][keys[i]]);
-        }
-      }
-    }
-  }
+  return Q.all(promises);
 }
 
 module.exports =
@@ -116,7 +102,14 @@ module.exports =
       processPages(this);
     },
     "page": function(page) {
-      return pageWrapper(this, page, true);
+      // process all normal sections in page
+      page.sections.filter(function(section) {
+        return section.type == 'normal';
+      })
+      .map(function(section) {
+        collectStore(section, page, this, true);
+      });
+      return page;
     }
   }
 };
