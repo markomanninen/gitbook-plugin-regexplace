@@ -2,7 +2,7 @@ gitbook-plugin-regexplace
 ==========
 General text replacement (RegExp -style) plugin for GitBook projects.
 
-RegExp guide: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+RegExp guide: [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
 
 Usage example
 -----
@@ -29,6 +29,7 @@ Mark page partitions to text (markdown) files:
 
 ```markdown
 <!-- nopb -->
+
 # Title
 
 Normal content...
@@ -52,7 +53,6 @@ When above configuration is combined with the following website.css code block, 
 
 ```css
 div.nopb {
-	display: table;
     page-break-inside: avoid;	
 }
 ```
@@ -74,7 +74,7 @@ Many other usages can be found for the plugin, because using html code blocks di
 Adding more complex container for image
 -----
 
-Next example is written with a help of RexExr v2.0 builder: http://regexr.com/3caon
+Next example is written with a help of RexExr v2.0 builder: [http://regexr.com/3caon](http://regexr.com/3caon)
 
 ```json
 {
@@ -134,3 +134,52 @@ figcaption {
 Screenshot from my [GitBook project](https://markomanninen.gitbooks.io/artifacts-of-the-flower-of-life/content/cownose.html) shown below:
 
 ![Image container](image-container.png)
+
+Counting and listing unique words on book
+-----
+
+Good way to do spell checking and text analysis is to count words on document and list them on test page. This can be achieved by regular expressions as well. First define configuration on ```book.json```:
+
+```json
+{
+	"plugins": ["regexplace"],
+	"pluginsConfig": {
+		"regexplace": {
+			"substitutes": [
+				{
+                    "pattern": "((?!([^<]+)?>)([0-9A-Za-z\\u0080-\\u00FF'.-]?)+(?!([^{]+)?})([0-9A-Za-z\\u0080-\\u00FF'])?(?!([^&]+)?;)([0-9A-Za-z\\u0080-\\u00FF']))",
+                    "flags": "g",
+                    "substitute": "$1",
+                    "store": {
+                        "substitute": "{$1}",
+                        "unique": true,
+                        "lower": true,
+                        "variable_name": "words"
+                    }
+                }
+			]
+		}
+	}
+}
+```
+
+By using _PAGE_PATH_ on store substitute we can get information on which page word is used, for example:
+
+```json
+"substitute": "{_PAGE_PATH_#$1}"
+```
+
+But for now we just want to list all unique words in lower case and sorted alphabetically. Next step is to output words on any page you wish, say ```keywords.md```:
+
+
+```markdown
+# Words
+
+Unique words in the book: {{ book.words.length }}
+
+<hr/>
+
+{{ book.words.sort().join(', ') }}
+```
+
+There you must be careful on printing words on the page, because they might also get counted on the final result. I have used output format ```{$1}``` for stored words and discounted them on pattern configuration: ```"pattern": "... (?!([^{]+)?}) ..."```. Also pattern ```"substitute": "$1"``` is important because you could easily replace all words on the book by this method. Here we recover match to the same position with ```$1```.
