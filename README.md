@@ -133,7 +133,7 @@ figcaption {
 
 Screenshot from my [GitBook project](https://markomanninen.gitbooks.io/artifacts-of-the-flower-of-life/content/cownose.html) shown below:
 
-![Image container](image-container.png)
+![Image container](https://github.com/markomanninen/gitbook-plugin-regexplace/raw/master/image-container.png)
 
 Counting and listing unique words on book
 -----
