@@ -2,9 +2,31 @@ gitbook-plugin-regexplace
 ==========
 General text replacement (RegExp -style) plugin for GitBook projects.
 
+Initial problems: 
+
+- Using html code blocks directly on markdown pages often ruins rendering a GitBook page
+- Similar type of content manipulation requires multiple plugins
+- Indexing a book content
+
+```gitbook-plugin-regexplace``` is to resolve these problems with tech-savvy approach: using js regular expressions and replace functionality plus giving option to add mathes on book variables.
+
 RegExp guide: [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
 
-Usage example
+RexExr v2.0 builder: [http://regexr.com](http://regexr.com)
+
+
+Usage examples
+-----
+
+* Prevent page break on PDF/print
+* Adding a container for image
+* Counting and listing unique words on a book
+* Using citations/footnotes
+
+> If you have new helpful use cases that could benefit plugin users, please send me a note so I can add new examples on this readme file: https://github.com/markomanninen/gitbook-plugin-regexplace
+
+
+Prevent page break
 -----
 
 Mark partitions on the page that should not break apart on printing the page or generating the page as a pdf.
@@ -66,15 +88,11 @@ Of course this also requires setting some style definitions for website and pdf 
 }
 ```
 
-Other examples
+
+Adding a container for image
 -----
 
-Many other usages can be found for the plugin, because using html code blocks directly on markdown pages often ruins rendering the page. To solve the problem, you have to set comment blocks as described above markdown. Then you can change them to html with substitutes defined on plugin configuration.
-
-Adding more complex container for image
------
-
-Next example is written with a help of RexExr v2.0 builder: [http://regexr.com/3caon](http://regexr.com/3caon)
+Next example is written with a help of RexExr v2.0 builder: [http://regexr.com/3caon](http://regexr.com/3caon) and inspired from the [image-caption](https://github.com/todvora/gitbook-plugin-image-captions) plugin of [@todvora](https://github.com/todvora).
 
 ```json
 {
@@ -135,6 +153,7 @@ Screenshot from my [GitBook project](https://markomanninen.gitbooks.io/artifacts
 
 ![Image container](https://github.com/markomanninen/gitbook-plugin-regexplace/raw/master/image-container.png)
 
+
 Counting and listing unique words on book
 -----
 
@@ -183,3 +202,98 @@ Unique words in the book: {{ book.words.length }}
 ```
 
 There you must be careful on printing words on the page, because they might also get counted on the final result. I have used output format ```{$1}``` for stored words and discounted them on pattern configuration: ```"pattern": "... (?!([^{]+)?}) ..."```. Also pattern ```"substitute": "$1"``` is important because you could easily replace all words on the book by this method. Here we recover match to the same position with ```$1```.
+
+
+Using citations
+-----
+
+Again a specific pattern must be included on plugin configuration on ```book.json``` file:
+
+```json
+{
+    "pattern": "<!-- cite author=\"(.*?)\" title=\"(.*?)\" date=\"(.*?)\" location=\"(.*?)\" type=\"(.*?)\"(.*?) -->",
+    "flags": "g",
+    "substitute": "<sup><a id=\"cite_INDEX_\" href=\"references.html#ref_PAGE_LEVEL_._INDEX_\" title=\"$1: $2 $3\" type=\"$5\">_INDEX_</a></sup>",
+    "store": {
+        "substitute": "<span><a id=\"ref_PAGE_LEVEL_._INDEX_\" href=\"_PAGE_PATH_#cite_INDEX_\">_PAGE_LEVEL_._INDEX_.</a></span> <span>$1:</span> <span><a$6>$2</a></span> <span>$3</span> <span>$4</span>",
+        "variable_name": "citations"
+    }
+}
+```
+
+This will find next text blocks from markdown pages, for example ```reflections.md```:
+
+```markdown
+<!-- cite author="wikipedia.org" title="Vesica Piscis" date="" location="" type="website" href="http://en.wikipedia.org/wiki/Vesica_piscis" -->
+```
+
+and replace it with html block:
+
+```html
+<sup><a id="cite1" href="references.html#ref1.1" title="wikipedia.org: Vesica Piscis " type="website">1</a></sup>
+```
+
+which is a footnote link with autoincrement index per chapter.
+
+On page for example ```references.md```, you can use this code snippet to list all citations used on a book:
+
+```markdown
+## Citations
+<ul>
+{% for cite in book.citations %}<li>{{ cite }}</li>{% endfor %}
+</ul>
+{% endif %}
+```
+
+Which will yield html:
+
+```html
+<h2>Citations</h2>
+<ul>
+<li><span><a id="ref1.1" href="reflections.html#cite1">1.1.</a></span> <span>wikipedia.org:</span> <span><a href="http://en.wikipedia.org/wiki/Vesica_piscis" target="_blank">Vesica Piscis</a></span> <span></span> <span></span></li>
+</ul>
+```
+
+The first link ```1.1.``` is a reference back to the citation place.
+
+If you want to list citations as footnotes at the end of each page/chapter, you could do separate include file, for example footnotes.md with the following code:
+
+```markdown
+<ul>
+{% for cite in book.citations %}
+{% if cite.match(file.path) %}<li>{{ cite }}</li>{% endif %}
+{% endfor %}
+</ul>
+{% endif %}
+```
+
+Then you can add that file on every page you want to support footnotes, presumely at the end of the file:
+
+```markdown
+{% include 'footnotes.md' %}
+```
+
+One more small visual thing is to add these declarations to a stylesheet file, ```website.css```:
+
+```css
+sup {
+    padding: 2px
+}
+ul.citations {
+    margin-left: -30px;
+}
+ul.citations li:nth-child(1) {
+    padding-top: 20px;
+    border-top: 1px solid #BBB;
+}
+ul.citations li {
+    font-size: 80%;
+    list-style: outside none none;
+}
+```
+
+Screenshot of output:
+
+![Footnotes](https://github.com/markomanninen/gitbook-plugin-regexplace/raw/master/footnotes.png)
+
+With ```gitbook-plugin-regexplace``` configuration patterns, substitutes, markdown templates and stylesheet you can manage a pretty detailed citation/footnote system on a GitBook project.
