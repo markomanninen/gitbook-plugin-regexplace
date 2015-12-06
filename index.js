@@ -60,12 +60,14 @@ var collectStore = function(section, page, that, pageHook) {
           }
           // if storage is used
           if (!pageHook && sub2) {
+            if (pattern.decode) sub2 = decodeHtmlEntities(sub2);
             if (pattern.store.lower) sub2 = sub2.toLowerCase();
             if (!pattern.store.unique || that.config.book.options.variables[pattern.store.variable_name].indexOf(sub2) < 0)
               that.config.book.options.variables[pattern.store.variable_name].push(sub2);
           }
           // repeatingly replace content
           content = match.input.replace(match[0], (pattern.decode ? decodeHtmlEntities(sub) : sub), match.index);
+          regex.lastIndex = 0;
       }
   });
   // finally replace section content with processed content
