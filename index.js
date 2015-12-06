@@ -67,7 +67,7 @@ var collectStore = function(section, page, that, pageHook) {
           }
           // repeatingly replace content
           content = match.input.replace(match[0], (pattern.decode ? decodeHtmlEntities(sub) : sub), match.index);
-          regex.lastIndex = 0;
+          if (!pattern.unreset) regex.lastIndex = 0;
       }
   });
   // finally replace section content with processed content
@@ -103,9 +103,10 @@ module.exports =
       // collects text replacement queries from plugin configuration
       options.substitutes.forEach(function (option) {
         patterns.push({re: new RegExp(option.pattern, option.flags || ''), 
-                       sub: option.substitute, 
-                       decode: option.decode || false, 
-                       store: option.store || null});
+                       sub: option.substitute,
+                       decode: option.decode || false,
+                       store: option.store || null,
+                       unreset: option.unreset || false});
       });
       this.config.book.options.variables = {};
       processPages(this);

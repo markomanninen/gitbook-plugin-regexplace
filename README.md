@@ -169,6 +169,7 @@ Good way to do spell checking and text analysis is to count words on document an
                     "pattern": "((?!([^<]+)?>)([0-9A-Za-z\\u0080-\\u00FF'.-]?)+(?!([^{]+)?})([0-9A-Za-z\\u0080-\\u00FF'])?(?!([^&]+)?;)([0-9A-Za-z\\u0080-\\u00FF']))",
                     "flags": "g",
                     "substitute": "$1",
+                    "unreset": true,
                     "store": {
                         "substitute": "{$1}",
                         "unique": true,
