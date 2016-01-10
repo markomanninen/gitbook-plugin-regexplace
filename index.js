@@ -82,16 +82,18 @@ function processPages(that) {
   var promises = navs.sort(function(a, b) {
     return a.order - b.order;
   })
-  .map(function(item) {
-    return that.parsePage(item.key).then(function(page) {
-      return page.sections.filter(function(section) {
-        return section.type == 'normal';
-      })
-      .map(function(section) {
-        collectStore(section, page, that);
+  .reduce(function(previous, item) {
+    return previous.then(function () {
+      return that.parsePage(item.key).then(function(page) {
+        return page.sections.filter(function(section) {
+          return section.type == 'normal';
+        })
+        .map(function(section) {
+          collectStore(section, page, that);
+        });
       });
     });
-  });
+  }, Q());
   return Q.all(promises);
 }
 
@@ -100,6 +102,7 @@ module.exports =
   hooks: {
     "init": function() {
       var options = this.options.pluginsConfig['regexplace'] || {};
+      options.substitutes = options.substitutes || {};
       // collects text replacement queries from plugin configuration
       options.substitutes.forEach(function (option) {
         patterns.push({re: new RegExp(option.pattern, option.flags || ''), 
@@ -108,8 +111,8 @@ module.exports =
                        store: option.store || null,
                        unreset: option.unreset || false});
       });
-      this.config.book.options.variables = {};
-      processPages(this);
+      this.config.book.options.variables = this.config.book.options.variables || {};
+      return processPages(this);
     },
     "page": function(page) {
       var that = this;
