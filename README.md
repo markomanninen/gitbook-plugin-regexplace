@@ -2,6 +2,8 @@ gitbook-plugin-regexplace
 ==========
 General text replacement (RegExp -style) plugin for GitBook projects.
 
+Note: version 2.0.0 and greater works only with GitBook 3!
+
 Initial problems: 
 
 - Using html code blocks directly on markdown pages often ruins rendering a GitBook page
@@ -13,7 +15,6 @@ Initial problems:
 RegExp guide: [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions)
 
 RexExr v2.0 builder: [http://regexr.com](http://regexr.com)
-
 
 Usage examples
 -----
