@@ -85,7 +85,7 @@ var collectStore = function(page, that, pageHook) {
           if (!pageHook && sub2) {
             if (pattern.decode) sub2 = decodeHtmlEntities(sub2);
             if (pattern.store.lower) sub2 = sub2.toLowerCase();
-            // Storage is either map-based or array-based
+            // Storage can be map-based with a key or array-based
             if(pattern.store.key) {
               if (!pattern.store.unique || !variables[pattern.store.variable_name][subkey]) {
                 variables[pattern.store.variable_name][subkey] = sub2;
