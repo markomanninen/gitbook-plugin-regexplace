@@ -337,10 +337,10 @@ We then define all our citations in ```references.md``` like this:
 <!-- define_citation code="cit2" author="wikipedia.org" title="Venn Diagram" date="" location="" type="website" href="https://en.wikipedia.org/wiki/Venn_diagram" -->
 ```
 
-The plugin will dynamically create the citations map as the ```book.variables.citations``` variable. We can then index it in markdown pages, for example ```reflections.md```:
+The plugin will dynamically create the citations map as the ```book.citations``` variable. We can then index it in markdown pages, for example ```reflections.md```:
 
 ```markdown
-The so-called "vescica piscis" {{book.variables.citations["cit1"]}} can be seen as a part of a Venn diagram {{book.variables.citations["cit2"]}} ...
+The so-called "vescica piscis" {{book.citations["cit1"]}} can be seen as a part of a Venn diagram {{book.citations["cit2"]}} ...
 ```
 
 The links and the citation text can then be styled through ```css``` in a way similar to the previous example.
