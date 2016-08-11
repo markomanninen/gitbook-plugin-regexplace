@@ -342,3 +342,5 @@ The plugin will dynamically create the citations map as the ```book.variables.ci
 ```markdown
 The so-called "vescica piscis" {{book.variables.citations["cit1"]}} can be seen as a part of a Venn diagram {{book.variables.citations["cit2"]}} ...
 ```
+
+The links and the citation text can then be styled through ```css``` in a way similar to the previous example.
