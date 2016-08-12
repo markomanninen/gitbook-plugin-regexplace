@@ -32,8 +32,10 @@ var collectStore = function(page, that, pageHook) {
   patterns.forEach(function (pattern) {
 
       var variables = that.config.get(vars);
-      if (pattern.store && pattern.store.variable_name && !variables[pattern.store.variable_name])
+      if (pattern.store && pattern.store.variable_name && !pattern.store.key && !variables[pattern.store.variable_name])
         variables[pattern.store.variable_name] = [];
+      if (pattern.store && pattern.store.variable_name && pattern.store.key && !variables[pattern.store.variable_name])
+        variables[pattern.store.variable_name] = {};
 
       var match;
       var i = 0;
@@ -42,18 +44,24 @@ var collectStore = function(page, that, pageHook) {
       // get matches from content
       while (match = regex.exec(content)) {
           i += 1;
-          var sub, sub2;
+          var sub, sub2, subkey;
           // use temporary storage if configured so
           if (!pageHook && pattern.store && pattern.store.substitute) {
             sub2 = pattern.store.substitute.replace(regex_index, i);
             sub2 = sub2.replace(regex_page_level, level);
             sub2 = sub2.replace(regex_page_path, path);
           }
+          // prepare the storage key if configured so
+          if (!pageHook && pattern.store && pattern.store.key) {
+            subkey = pattern.store.key.replace(regex_index, i);
+            subkey = subkey.replace(regex_page_level, level);
+            subkey = subkey.replace(regex_page_path, path);
+          }
           // set _INDEX_, _PAGE_LEVEL_ and _PAGE_PATH_ templates
           sub = pattern.sub.replace(regex_index, i);
           sub = sub.replace(regex_page_level, level);
           sub = sub.replace(regex_page_path, path);
-          // find $n replacement parts from substitute string
+          // find $n replacement parts from substitute string, on all substitutions
           for (var c = 1; c < match.length; c++) {
             var $ = '\$'+c;
             var count = sub.split($).length;
@@ -66,13 +74,26 @@ var collectStore = function(page, that, pageHook) {
                 sub2 = sub2.replace($, match[c]);
               }
             }
+            if (!pageHook && subkey) {
+              count = subkey.split($).length;
+              for (d = 0; d < count; d++) {
+                subkey = subkey.replace($, match[c]);
+              }
+            }
           }
           // if storage is used
           if (!pageHook && sub2) {
             if (pattern.decode) sub2 = decodeHtmlEntities(sub2);
             if (pattern.store.lower) sub2 = sub2.toLowerCase();
-            if (!pattern.store.unique || variables[pattern.store.variable_name].indexOf(sub2) < 0) {
-              variables[pattern.store.variable_name].push(sub2);
+            // Storage can be map-based with a key or array-based
+            if(pattern.store.key) {
+              if (!pattern.store.unique || !variables[pattern.store.variable_name][subkey]) {
+                variables[pattern.store.variable_name][subkey] = sub2;
+              }
+            } else {
+              if (!pattern.store.unique || variables[pattern.store.variable_name].indexOf(sub2) < 0) {
+                variables[pattern.store.variable_name].push(sub2);
+              }
             }
           }
           // repeatingly replace content

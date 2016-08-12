@@ -299,3 +299,48 @@ Screenshot of output:
 ![Footnotes](https://github.com/markomanninen/gitbook-plugin-regexplace/raw/master/footnotes.png)
 
 With ```gitbook-plugin-regexplace``` configuration patterns, substitutes, markdown templates and stylesheet you can manage a pretty detailed citation/footnote system on a GitBook project.
+
+
+Data generation and lookup
+-----
+
+Gitbook offers the possibility of using variables in ```book.json``` so that data can be dynamically looked up in Markdown files. As a silly example, a variable can be used to hold the name of a character in a story, so that every time the author changes their mind about the name it can be replaced in just one place.
+
+However, variables can be much more powerful than that. A map variable can hold a lot of data that could be looked up at different points in the book, using unique keys as indices. This would be really useful, if it wasn't for the fact that if you have a lot of data your ```book.json``` becomes very large.
+
+Ideally, you would like to list your data items in a separate file, or maybe more than one file. Because ```gitbook-plugin-regexplace``` allows you to store regular expression matches in a variable, you can construct your map from data contained in Markdown files. All you need to do is to have a ```key``` parameter in the ```store``` section, and instead of storing the data in an array the plugin will treat the variable as a map, using the ```key``` to index it.
+
+For example, let's consider an alternative way of doing citations. We are going to define all our citations in a Markdown file, which will be compiled with the full data for the citations; we will then use a dynamically created variable in other Markdown files to create the links to the citations.
+
+Here is the pattern in ```book.json```:
+
+```json
+{
+    "pattern": "<!-- define_citation code=\"(.*?)\" author=\"(.*?)\" title=\"(.*?)\" date=\"(.*?)\" location=\"(.*?)\" type=\"(.*?)\"(.*?) -->",
+    "flags": "g",
+    "substitute": "<span><a id=\"ref_$1\">$1</a></span> <span>$2:</span> <span><a$7>$3</a></span> <span>$4</span> <span>$5</span>",
+    "store": {
+        "key": "$1",
+        "substitute": "<sup><a id=\"cite_$1\" href=\"references.html#ref_$1\" title=\"$2: $3 $4\" type=\"$6\">$1</a></sup>",
+        "variable_name": "citations"
+    }
+}
+```
+
+Note the ```code=``` attribute in the HTML comment. This will be used as the map key because of the ```key: "$1"``` property of the ```store``` section. Also note that, contrary to the previous use case, we are now substituting the full definition of the citation, and storing the link to it.
+
+We then define all our citations in ```references.md``` like this:
+
+```markdown
+<!-- define_citation code="cit1" author="wikipedia.org" title="Vesica Piscis" date="" location="" type="website" href="http://en.wikipedia.org/wiki/Vesica_piscis" -->
+
+<!-- define_citation code="cit2" author="wikipedia.org" title="Venn Diagram" date="" location="" type="website" href="https://en.wikipedia.org/wiki/Venn_diagram" -->
+```
+
+The plugin will dynamically create the citations map as the ```book.citations``` variable. We can then index it in markdown pages, for example ```reflections.md```:
+
+```markdown
+The so-called "vescica piscis" {{book.citations["cit1"]}} can be seen as a part of a Venn diagram {{book.citations["cit2"]}} ...
+```
+
+The links and the citation text can then be styled through ```css``` in a way similar to the previous example.
