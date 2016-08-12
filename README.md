@@ -23,6 +23,7 @@ Usage examples
 * Adding a container for image
 * Counting and listing unique words on a book
 * Using citations/footnotes
+* Data generation and lookup (thanks to [Dario Domizioli](https://github.com/hhexo) for contribution!)
 
 > If you have new helpful use cases that could benefit plugin users, please send me a note so I can add new examples on this readme file: https://github.com/markomanninen/gitbook-plugin-regexplace
 

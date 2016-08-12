@@ -1,6 +1,6 @@
 {
   "name": "gitbook-plugin-regexplace",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Replace (RegExp -style) page section texts with given substitutes on GitBook projects",
   "scripts": {
     "test": "echo \"Error: no tests specified\" && exit 1"
