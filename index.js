@@ -113,7 +113,7 @@ function processPages(that) {
       page.content = pageContent;
       return [collectStore(page, that)];
     }));
-  });
+  }, Q());
   return Q.all(promises);
 }
 
